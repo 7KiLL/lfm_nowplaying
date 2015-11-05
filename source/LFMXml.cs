@@ -31,5 +31,7 @@ namespace LastFM_Now_Playing
             string nowplaying = pretext + node1.InnerText + " - " + node.InnerText;
             return nowplaying;
         }
+
+
     }
 }

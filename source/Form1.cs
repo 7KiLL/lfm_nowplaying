@@ -1,29 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Web;
-using System.Net;
 using System.IO;
-using System.Text.RegularExpressions;
-using System.Collections;
-using System.Threading;
-using System.Security.AccessControl;
-using System.Timers;
+using System.Net.Http;
+using System.Xml;
+
 
 namespace LastFM_Now_Playing
 {
     public partial class Form1 : Form
     {
         LFMXml XML = new LFMXml();
-        public bool rdyOrNot = false;
-        public static System.Timers.Timer aTimer;
-
+ 
         public Form1()
         {
             InitializeComponent();
@@ -33,7 +21,7 @@ namespace LastFM_Now_Playing
             aTimer.Elapsed += OnTimedEvent;
             aTimer.AutoReset = true;
             aTimer.Enabled = true;
-            changeLabel();
+            
             
             //Path things
             folderPath.Text = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
@@ -43,44 +31,23 @@ namespace LastFM_Now_Playing
             notifyIcon1.Visible = false; //Tray icon
         }
 
+        //Global variables
+        public static System.Timers.Timer aTimer;
         public string savePlace = "";
         public string userName = "";
         bool check = false;
-        public bool correctName = true;
 
+        //Work with NowPlaying file
         public string saveNP(string np, string path)
         {
             string g = np;
-            StreamWriter sw = new StreamWriter(path + "\\np.txt");
-            
+            StreamWriter sw = new StreamWriter(path + "\\np.txt");      
             sw.Write(g);
             sw.Close();
             return "";
         }
 
-        public async Task changeLabel()
-        {
-            
-            await Task.Delay(1000);
-            rdyOrNot = false;
-            string cod = await CheckName(lfmUsername.Text);
-            if (!cod.Equals("6"))
-            {
-                label1.ForeColor = System.Drawing.Color.Green;
-                label1.Text = "Valid";
-                startParse.Enabled = true;
-
-            }
-            else
-            {
-                label1.ForeColor = System.Drawing.Color.DarkRed;
-                label1.Text = "Invalid";
-                startParse.Enabled = false;
-            }
-
-        }
-
-
+        //Now playing update cycle
         private void OnTimedEvent(Object source, System.Timers.ElapsedEventArgs e)
         {
             if (check)
@@ -91,53 +58,52 @@ namespace LastFM_Now_Playing
             }
         }
 
-        
+        //Get an API code of userInfo
+        //Maybe I should check code of error node istead of just check lfm status, but it crushes when user is found
+        //Possible problems it's different errors because of an API problem, too many API requests from IP etc.
+        public async Task CheckName(string name)
+        { 
+            HttpClientHandler handler = new HttpClientHandler();
+            HttpClient httpClient = new HttpClient(handler);
+            httpClient.Timeout = TimeSpan.FromSeconds(100);
+            string getResponsestring = "";
+            Uri url = new Uri("http://ws.audioscrobbler.com/2.0/?method=user.getInfo&user=" + name + "&api_key=5b801a66d1a34e73b6e563afc27ef06b");
+            HttpResponseMessage response = await httpClient.GetAsync(url);
+            getResponsestring = await response.Content.ReadAsStringAsync();
 
-        public async Task<string> CheckName(string name)
-        {
-            
-            string url = "http://7kill.bl.ee/user-check.php?name=" + name;
-            string HtmlText = string.Empty;
-            HttpWebRequest myHttwebrequest =  (HttpWebRequest)HttpWebRequest.Create(url);
-            HttpWebResponse myHttpWebresponse = (HttpWebResponse)myHttwebrequest.GetResponse();
-            StreamReader strm = new StreamReader(myHttpWebresponse.GetResponseStream());
-            HtmlText = strm.ReadToEnd();
-            return HtmlText;
+            XmlDocument xmlDoc = new XmlDocument();
+            xmlDoc.LoadXml(getResponsestring);
+            XmlNode root = xmlDoc.DocumentElement;     
+            string attr = root.SelectSingleNode("/lfm/@status").Value;
+
+            if (attr == "ok")
+            {
+                startParse.Enabled = true;
+                label1.ForeColor = System.Drawing.Color.Green;
+                label1.Text = "Valid";
+            }
+
+            if (attr == "failed")
+            {
+                startParse.Enabled = false;
+                label1.ForeColor = System.Drawing.Color.DarkRed;
+                label1.Text = "Invalid";
+            }   
         }
 
-        void Parsing(string path, string name)
-        {
-            
-            string url = "http://7kill.bl.ee/lfm.php?name=" + userName;
-            string HtmlText = string.Empty;
-            HttpWebRequest myHttwebrequest = (HttpWebRequest)HttpWebRequest.Create(url);
-            HttpWebResponse myHttpWebresponse = (HttpWebResponse)myHttwebrequest.GetResponse();
-            StreamReader strm = new StreamReader(myHttpWebresponse.GetResponseStream());
-            HtmlText = strm.ReadToEnd();
-
-            string g = "";
-            g = HtmlText;
-            StreamWriter sw = new StreamWriter(path + "\\np.txt");
-            sw.Write("Now Playing: {0}", g);
-            sw.Close();
-            notifyIcon1.Text = "Now playing: " + g;
-                
-
-        }
-
+        //Getting path to save Now Playing file
         private void getPath_Click(object sender, EventArgs e)
         {
             if (folderBrowserDialog1.ShowDialog() == DialogResult.OK)
             {
                 this.folderPath.Text = folderBrowserDialog1.SelectedPath;
-                savePlace = @folderBrowserDialog1.SelectedPath;
-
+                savePlace = folderBrowserDialog1.SelectedPath;
             }
         }
 
+        //Enable cycle to parse recenttracks, blocks textareas
         private void startParse_Click(object sender, EventArgs e)
-        {
-            
+        { 
             if (parseStatus.Text == "Not parsing")
             {
                 check = true;
@@ -147,7 +113,6 @@ namespace LastFM_Now_Playing
                 startParse.Text = "Stop";
                 folderPath.Enabled = false;
                 lfmUsername.Enabled = false;
-
             }
 
             else
@@ -161,6 +126,7 @@ namespace LastFM_Now_Playing
             }
         }
 
+        //Notify icon. Working a bit strange. I'll try to fix it later
         private void Form1_Deactivate(object sender, EventArgs e)
         {
             if (this.WindowState == FormWindowState.Minimized)
@@ -169,7 +135,6 @@ namespace LastFM_Now_Playing
                 notifyIcon1.Visible = true;
             }
         }
-
         private void notifyIcon1_Click(object sender, EventArgs e)
         {
             if (this.WindowState == FormWindowState.Minimized)
@@ -179,16 +144,11 @@ namespace LastFM_Now_Playing
                 notifyIcon1.Visible = false;
             }
         }
-
+        
+        //Cheching user async when user typing username
         private async void lfmUsername_TextChanged(object sender, EventArgs e)
         {
-            if (!rdyOrNot)
-            {
-                rdyOrNot = true;
-                await changeLabel();
-            }
+                 await CheckName(lfmUsername.Text);      
         }
-
-        
     }
 }

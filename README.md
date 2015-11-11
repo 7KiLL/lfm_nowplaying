@@ -15,5 +15,4 @@ I hope I've made setting more than intuitive, but I'd explain it to be sure:
 
 3. Prefix. Just let it be. I've spent a lot of fun-time to make it so you have to be happy! Have an option to fill result as your own text like "No music for now, guys". 
 
-
 Author: [7KiLL](http://www.last.fm/ru/user/mr7kill)

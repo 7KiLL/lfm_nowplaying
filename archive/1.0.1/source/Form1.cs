@@ -4,17 +4,14 @@ using System.Windows.Forms;
 using System.IO;
 using System.Net.Http;
 using System.Xml;
-using LastFM_Now_Playing.Properties;
+
 
 namespace LastFM_Now_Playing
 {
     public partial class Form1 : Form
     {
         LFMXml XML = new LFMXml();
-        NowPlaying lfm = new NowPlaying();
-        Form2 settings = new Form2();
-        Form3 about = new Form3();
-
+ 
         public Form1()
         {
             InitializeComponent();
@@ -25,15 +22,13 @@ namespace LastFM_Now_Playing
             aTimer.AutoReset = true;
             aTimer.Enabled = true;
             
+            
             //Path things
             folderPath.Text = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
             savePlace = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-            CheckName(lfmUsername.Text);
+            lfmUsername.Text = "mr7kill";
             userName = lfmUsername.Text;
             notifyIcon1.Visible = false; //Tray icon
-            if(Settings.Default.path!="")
-                folderPath.Text = Settings.Default.path;
-            lfmUsername.Text = Settings.Default.username;
         }
 
         //Global variables
@@ -41,10 +36,6 @@ namespace LastFM_Now_Playing
         public string savePlace = "";
         public string userName = "";
         bool check = false;
-
-        
-
-        
 
         //Work with NowPlaying file
         public string saveNP(string np, string path)
@@ -61,14 +52,9 @@ namespace LastFM_Now_Playing
         {
             if (check)
             {
-                string nowPlayingText = lfm.Generate(lfmUsername.Text, Settings.Default.divider, Settings.Default.reverse,
-                    Settings.Default.np, Settings.Default.nowplayingtext, Settings.Default.lastplayedtext,
-                    Settings.Default.fill);
-                if (nowPlayingText.Length >= 63)
-                    notifyIcon1.Text = nowPlayingText.Substring(0, 63);
-                else
-                    notifyIcon1.Text = nowPlayingText;               
-                saveNP(nowPlayingText, savePlace);
+                notifyIcon1.Text = XML.RecentTracks(userName);
+                saveNP(XML.RecentTracks(userName), savePlace);
+
             }
         }
 
@@ -163,23 +149,6 @@ namespace LastFM_Now_Playing
         private async void lfmUsername_TextChanged(object sender, EventArgs e)
         {
                  await CheckName(lfmUsername.Text);      
-        }
-
-        private void Form1_FormClosed(object sender, FormClosedEventArgs e)
-        {
-            Settings.Default.path = folderPath.Text;
-            Settings.Default.username = lfmUsername.Text;
-            Settings.Default.Save();
-        }
-
-        private void button1_Click(object sender, EventArgs e)
-        {
-            settings.ShowDialog();
-        }
-
-        private void btnAbout_Click(object sender, EventArgs e)
-        {
-            about.ShowDialog();
         }
     }
 }

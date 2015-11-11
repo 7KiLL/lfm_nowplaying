@@ -43,8 +43,6 @@
             this.label1 = new System.Windows.Forms.Label();
             this.notifyIcon1 = new System.Windows.Forms.NotifyIcon(this.components);
             this.timer2 = new System.Windows.Forms.Timer(this.components);
-            this.button1 = new System.Windows.Forms.Button();
-            this.btnAbout = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.errorProvider1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -96,11 +94,11 @@
             // parseStatus
             // 
             this.parseStatus.AutoSize = true;
-            this.parseStatus.Font = new System.Drawing.Font("Century Gothic", 20F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.parseStatus.Font = new System.Drawing.Font("Century Gothic", 14F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.parseStatus.ForeColor = System.Drawing.Color.DarkRed;
-            this.parseStatus.Location = new System.Drawing.Point(188, 116);
+            this.parseStatus.Location = new System.Drawing.Point(209, 134);
             this.parseStatus.Name = "parseStatus";
-            this.parseStatus.Size = new System.Drawing.Size(165, 32);
+            this.parseStatus.Size = new System.Drawing.Size(116, 23);
             this.parseStatus.TabIndex = 5;
             this.parseStatus.Text = "Not parsing";
             // 
@@ -124,33 +122,11 @@
             this.notifyIcon1.Visible = true;
             this.notifyIcon1.Click += new System.EventHandler(this.notifyIcon1_Click);
             // 
-            // button1
-            // 
-            this.button1.Location = new System.Drawing.Point(276, 1);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(64, 23);
-            this.button1.TabIndex = 7;
-            this.button1.Text = "Settings";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
-            // 
-            // btnAbout
-            // 
-            this.btnAbout.Location = new System.Drawing.Point(346, 1);
-            this.btnAbout.Name = "btnAbout";
-            this.btnAbout.Size = new System.Drawing.Size(51, 23);
-            this.btnAbout.TabIndex = 8;
-            this.btnAbout.Text = "About";
-            this.btnAbout.UseVisualStyleBackColor = true;
-            this.btnAbout.Click += new System.EventHandler(this.btnAbout_Click);
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(405, 172);
-            this.Controls.Add(this.btnAbout);
-            this.Controls.Add(this.button1);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.parseStatus);
             this.Controls.Add(this.startParse);
@@ -165,7 +141,6 @@
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.Text = "Last.FM Now Playing";
             this.Deactivate += new System.EventHandler(this.Form1_Deactivate);
-            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.Form1_FormClosed);
             ((System.ComponentModel.ISupportInitialize)(this.errorProvider1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -187,8 +162,6 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.NotifyIcon notifyIcon1;
         private System.Windows.Forms.Timer timer2;
-        private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.Button btnAbout;
     }
 }
 

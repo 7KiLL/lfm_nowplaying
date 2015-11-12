@@ -9,19 +9,7 @@ namespace LastFM_Now_Playing
 
     class NowPlaying
     {
-        //"Controll" class. Operating with variables to make your own string
         LFMXml lfm = new LFMXml();
-        /// <summary>
-        /// So what is params doing?
-        /// </summary>
-        /// <param name="username">Last FM username. Using to get XML and parse it.</param>
-        /// <param name="divider">Character which divide Song and Artist</param>
-        /// <param name="reverse">Change standart formant ARTIST-SONG to SONG-ARTIST</param>
-        /// <param name="np">Tells to method add or not add prefix</param>
-        /// <param name="nowp">Prefix when "nowplaying" attribute = true(currently playing)</param>
-        /// <param name="lastp">Prefix when "nowplaying" attribute = false(currently not playing)</param>
-        /// <param name="fill">When "nowplaying"=false, You can use prefix as ready string</param>
-        /// <returns></returns>
         public string Generate(string username, string divider, bool reverse, bool np, string nowp, string lastp, bool fill)
         {
             string Song = lfm.GetSong(username);

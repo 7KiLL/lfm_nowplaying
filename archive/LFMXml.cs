@@ -11,7 +11,6 @@ namespace LastFM_Now_Playing
 {
     class LFMXml
     {
-        //Old method to get Now Playing as ready string 
         public string RecentTracks(string username, bool np)
         {
             string pretext = "Last played: ";
@@ -37,7 +36,6 @@ namespace LastFM_Now_Playing
             return nowplaying;
         }
 
-        //Returns Song name
         public string GetSong(string username)
         {
             string xmlStr;
@@ -52,7 +50,6 @@ namespace LastFM_Now_Playing
             return node.InnerText;
         }
 
-        //Returns Artist name
         public string GetArtist(string username)
         {
             string xmlStr;
@@ -67,7 +64,6 @@ namespace LastFM_Now_Playing
             return node.InnerText;
         }
 
-        //Returns true/false depending on the "nowplaying" attribute
         public bool GetNowPlaying(string username)
         {
             string xmlStr;
@@ -88,6 +84,9 @@ namespace LastFM_Now_Playing
 
                     return Convert.ToBoolean(node.InnerText);
         }
+
+
+
 
     }
 }

@@ -40,7 +40,11 @@ namespace LastFM_Now_Playing
         public static System.Timers.Timer aTimer;
         public string savePlace = "";
         public string userName = "";
-        bool check = false;   
+        bool check = false;
+
+        
+
+        
 
         //Work with NowPlaying file
         public string saveNP(string np, string path)
@@ -137,14 +141,11 @@ namespace LastFM_Now_Playing
         }
 
         //Notify icon. Working a bit strange. I'll try to fix it later
-        //1.1.0.2 Fixed. Visible attribute have to be deactivated 
-        //or you can open window with ALT+Tab combo
         private void Form1_Deactivate(object sender, EventArgs e)
         {
             if (this.WindowState == FormWindowState.Minimized)
             {
                 this.ShowInTaskbar = false;
-                this.Visible = false;
                 notifyIcon1.Visible = true;
             }
         }
@@ -154,7 +155,6 @@ namespace LastFM_Now_Playing
             {
                 this.WindowState = FormWindowState.Normal;
                 this.ShowInTaskbar = true;
-                this.Visible = true;
                 notifyIcon1.Visible = false;
             }
         }
@@ -162,24 +162,21 @@ namespace LastFM_Now_Playing
         //Cheching user async when user typing username
         private async void lfmUsername_TextChanged(object sender, EventArgs e)
         {
-                 await CheckName(lfmUsername.Text.Trim());      
+                 await CheckName(lfmUsername.Text);      
         }
 
-        //Saving variables
         private void Form1_FormClosed(object sender, FormClosedEventArgs e)
         {
             Settings.Default.path = folderPath.Text;
-            Settings.Default.username = lfmUsername.Text.Trim();
+            Settings.Default.username = lfmUsername.Text;
             Settings.Default.Save();
         }
 
-        //Open Settings widnow
         private void button1_Click(object sender, EventArgs e)
         {
             settings.ShowDialog();
         }
 
-        //Open About window
         private void btnAbout_Click(object sender, EventArgs e)
         {
             about.ShowDialog();

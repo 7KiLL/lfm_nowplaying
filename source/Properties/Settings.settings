@@ -1,0 +1,30 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="LastFM_Now_Playing.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="username" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="path" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="nowplayingtext" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Now playing: </Value>
+    </Setting>
+    <Setting Name="lastplayedtext" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Last played: </Value>
+    </Setting>
+    <Setting Name="fill" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="reverse" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="np" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="divider" Type="System.String" Scope="User">
+      <Value Profile="(Default)"> - </Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

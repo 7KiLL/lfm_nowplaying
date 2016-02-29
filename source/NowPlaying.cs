@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 namespace LastFM_Now_Playing
 {
 
-    class NowPlaying
+    class NowPlaying : LFMXml
     {
         //"Controll" class. Operating with variables to make your own string
-        LFMXml lfm = new LFMXml();
+        
         /// <summary>
-        /// So what is params doing?
+        /// Returns "Now playing" string
         /// </summary>
         /// <param name="username">Last FM username. Using to get XML and parse it.</param>
         /// <param name="divider">Character which divide Song and Artist</param>
@@ -22,16 +22,20 @@ namespace LastFM_Now_Playing
         /// <param name="lastp">Prefix when "nowplaying" attribute = false(currently not playing)</param>
         /// <param name="fill">When "nowplaying"=false, You can use prefix as ready string</param>
         /// <returns></returns>
-        public string Generate(string username, string divider, bool reverse, bool np, string nowp, string lastp, bool fill)
+        public string Generate(string username)
         {
-            string Song = lfm.GetSong(username);
-            string Artist = lfm.GetArtist(username);
-            bool npStatus = lfm.GetNowPlaying(username);
-            string Divider = divider;
-            string npPrefix = nowp;
-            string lpPrefix = lastp;
-            string NPString = "";
-            if(!np) { 
+            GetXML(username);
+            var Song = _xml["Song"];
+            var Artist = _xml["Artist"];
+            var npStatus = Convert.ToBoolean(_xml["NowPlaying"]);
+            var Divider = Properties.Settings.Default.divider;
+            var npPrefix = Properties.Settings.Default.nowplayingtext;
+            var lpPrefix = Properties.Settings.Default.lastplayedtext;
+            var reverse = Properties.Settings.Default.reverse;
+            var fill = Properties.Settings.Default.fill;
+            var NPString = "";
+            var np = Properties.Settings.Default.np;
+            if (!np) { 
                 if (reverse)
                         NPString = Song + Divider + Artist;         
                 if (!reverse)  

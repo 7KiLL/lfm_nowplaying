@@ -10,9 +10,9 @@ using System.Windows.Forms;
 
 namespace LastFM_Now_Playing
 {
-    public partial class Form3 : Form
+    public partial class About : Form
     {
-        public Form3()
+        public About()
         {
             InitializeComponent();
         }

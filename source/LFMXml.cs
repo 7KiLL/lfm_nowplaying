@@ -1,93 +1,49 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using System.Net;
 using System.Xml;
 using System.IO;
 
+
 namespace LastFM_Now_Playing
 {
-    class LFMXml
+
+    internal class LFMXml
     {
-        //Old method to get Now Playing as ready string 
-        public string RecentTracks(string username, bool np)
+        public static Dictionary<string, string> _xml;
+        public static string API_KEY
         {
-            string pretext = "Last played: ";
-            string xmlStr;
-            string nowplaying = "";
-            HttpWebRequest myHttwebrequest = (HttpWebRequest)HttpWebRequest.Create("http://ws.audioscrobbler.com/2.0/?method=user.getRecentTracks&user=" + username +"&api_key=5b801a66d1a34e73b6e563afc27ef06b&limit=1");
-            HttpWebResponse myHttpWebresponse = (HttpWebResponse)myHttwebrequest.GetResponse();
-            StreamReader strm = new StreamReader(myHttpWebresponse.GetResponseStream());
-            xmlStr = strm.ReadToEnd();
-            XmlDocument xmlDoc = new XmlDocument();
-            xmlDoc.LoadXml(xmlStr);
-            XmlNode root = xmlDoc.DocumentElement;
-            XmlNode node = root.SelectSingleNode("//name");
-            XmlNode node1 = root.SelectSingleNode("//artist");
-            XmlNode node2 = root.SelectSingleNode("//track/@nowplaying");
-            if (node2 != null)
-                if (node2.InnerText == "true")
-                    pretext = "Now playing: ";
-            if(np)
-                nowplaying = pretext + node1.InnerText + " - " + node.InnerText;
-            if(!np)
-                nowplaying = node1.InnerText + " - " + node.InnerText;
-            return nowplaying;
+            get { return "&api_key=59c75ce54be869532e03f89b19edd849"; }
         }
 
-        //Returns Song name
-        public string GetSong(string username)
+        public static Dictionary<string, string> Xml
         {
-            string xmlStr;
-            HttpWebRequest myHttwebrequest = (HttpWebRequest)HttpWebRequest.Create("http://ws.audioscrobbler.com/2.0/?method=user.getRecentTracks&user=" + username + "&api_key=5b801a66d1a34e73b6e563afc27ef06b&limit=1");
-            HttpWebResponse myHttpWebresponse = (HttpWebResponse)myHttwebrequest.GetResponse();
-            StreamReader strm = new StreamReader(myHttpWebresponse.GetResponseStream());
-            xmlStr = strm.ReadToEnd();
-            XmlDocument xmlDoc = new XmlDocument();
-            xmlDoc.LoadXml(xmlStr);
-            XmlNode root = xmlDoc.DocumentElement;
-            XmlNode node = root.SelectSingleNode("//name");
-            return node.InnerText;
+            get { return _xml; }
+            set { _xml = value; }
         }
 
-        //Returns Artist name
-        public string GetArtist(string username)
+        public void  GetXML(string username)
         {
             string xmlStr;
-            HttpWebRequest myHttwebrequest = (HttpWebRequest)HttpWebRequest.Create("http://ws.audioscrobbler.com/2.0/?method=user.getRecentTracks&user=" + username + "&api_key=5b801a66d1a34e73b6e563afc27ef06b&limit=1");
-            HttpWebResponse myHttpWebresponse = (HttpWebResponse)myHttwebrequest.GetResponse();
-            StreamReader strm = new StreamReader(myHttpWebresponse.GetResponseStream());
+            Dictionary<string, string> Track = new Dictionary<string, string>();
+            var myHttwebrequest =
+                (HttpWebRequest)
+                    HttpWebRequest.Create("http://ws.audioscrobbler.com/2.0/?method=user.getRecentTracks&user=" +
+                                          username + API_KEY + "&limit=1");
+            var myHttpWebresponse = (HttpWebResponse)myHttwebrequest.GetResponse();
+            var strm = new StreamReader(myHttpWebresponse.GetResponseStream());
             xmlStr = strm.ReadToEnd();
-            XmlDocument xmlDoc = new XmlDocument();
+            var xmlDoc = new XmlDocument();
             xmlDoc.LoadXml(xmlStr);
             XmlNode root = xmlDoc.DocumentElement;
-            XmlNode node = root.SelectSingleNode("//artist");
-            return node.InnerText;
-        }
-
-        //Returns true/false depending on the "nowplaying" attribute
-        public bool GetNowPlaying(string username)
-        {
-            string xmlStr;
-            HttpWebRequest myHttwebrequest = (HttpWebRequest)HttpWebRequest.Create("http://ws.audioscrobbler.com/2.0/?method=user.getRecentTracks&user=" + username + "&api_key=5b801a66d1a34e73b6e563afc27ef06b&limit=1");
-            HttpWebResponse myHttpWebresponse = (HttpWebResponse)myHttwebrequest.GetResponse();
-            StreamReader strm = new StreamReader(myHttpWebresponse.GetResponseStream());
-            xmlStr = strm.ReadToEnd();
-            XmlDocument xmlDoc = new XmlDocument();
-            xmlDoc.LoadXml(xmlStr);
-            XmlNode root = xmlDoc.DocumentElement;
-            XmlNode node = root.SelectSingleNode("//track/@nowplaying");
-            if (node != null) {
-                if (node.InnerText == "true")
-                    return true;
-                    }
-                    if (node == null)
-                        return false;         
-
-                    return Convert.ToBoolean(node.InnerText);
+            Track.Add("Song", root.SelectSingleNode("//name").InnerText);
+            Track.Add("Artist", root.SelectSingleNode("//artist").InnerText);
+            if (root.SelectSingleNode("//track/@nowplaying") != null)       
+                Track.Add("NowPlaying", root.SelectSingleNode("//track/@nowplaying").InnerText);
+            else
+                Track.Add("NowPlaying", "false");
+            Xml = Track;
         }
 
     }
 }
+

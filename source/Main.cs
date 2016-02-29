@@ -2,20 +2,37 @@
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
+using System.Net;
 using System.Net.Http;
 using System.Xml;
+using System.Threading;
+using System.Xml.XPath;
 using LastFM_Now_Playing.Properties;
 
 namespace LastFM_Now_Playing
 {
-    public partial class Form1 : Form
+
+    public partial class Main : Form
     {
+
         LFMXml XML = new LFMXml();
         NowPlaying lfm = new NowPlaying();
-        Form2 settings = new Form2();
-        Form3 about = new Form3();
+        Settings settings = new Settings();
+        About about = new About();
+       
 
-        public Form1()
+
+        public bool Check
+        {
+            get {return check;}
+            set {check = value; }
+        }
+        public string Lname {
+            get { return lfmUsername.Text; }
+            set { lfmUsername.Text = value; }
+        }
+
+        public Main()
         {
             InitializeComponent();
             //Timer cycle for parsing
@@ -28,12 +45,12 @@ namespace LastFM_Now_Playing
             //Path things
             folderPath.Text = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
             savePlace = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-            CheckName(lfmUsername.Text);
+            startParse.Enabled = false;
             userName = lfmUsername.Text;
             notifyIcon1.Visible = false; //Tray icon
-            if(Settings.Default.path!="")
-                folderPath.Text = Settings.Default.path;
-            lfmUsername.Text = Settings.Default.username;
+            if(Properties.Settings.Default.path!="")
+                folderPath.Text = Properties.Settings.Default.path;
+            lfmUsername.Text = Properties.Settings.Default.username;
         }
 
         //Global variables
@@ -45,34 +62,38 @@ namespace LastFM_Now_Playing
         //Work with NowPlaying file
         public string saveNP(string np, string path)
         {
-            string g = np;
-            StreamWriter sw = new StreamWriter(path + "\\np.txt");      
+            var g = np;
+            var sw = new StreamWriter(path + "\\np.txt");      
             sw.Write(g);
             sw.Close();
             return "";
         }
 
+
         //Now playing update cycle
-        private void OnTimedEvent(Object source, System.Timers.ElapsedEventArgs e)
-        {
+        public void OnTimedEvent(Object source, System.Timers.ElapsedEventArgs e)
+        {        
             if (check)
             {
-                string nowPlayingText = lfm.Generate(lfmUsername.Text, Settings.Default.divider, Settings.Default.reverse,
-                    Settings.Default.np, Settings.Default.nowplayingtext, Settings.Default.lastplayedtext,
-                    Settings.Default.fill);
-                if (nowPlayingText.Length >= 63)
-                    notifyIcon1.Text = nowPlayingText.Substring(0, 63);
-                else
-                    notifyIcon1.Text = nowPlayingText;               
-                saveNP(nowPlayingText, savePlace);
+                
+                    var nowPlayingText = lfm.Generate(
+                        lfmUsername.Text.Trim());
+
+                    if (nowPlayingText.Length >= 63)
+                        notifyIcon1.Text = nowPlayingText.Substring(0, 63);
+                    else
+                        notifyIcon1.Text = nowPlayingText;
+                    saveNP(nowPlayingText, savePlace);
+
             }
         }
 
+        
         //Get an API code of userInfo
-        //Maybe I should check code of error node istead of just check lfm status, but it crushes when user is found
+        //Maybe I should check code of error node instead of just check lfm status, but it crushes when user is found
         //Possible problems it's different errors because of an API problem, too many API requests from IP etc.
         public async Task CheckName(string name)
-        { 
+        {
             HttpClientHandler handler = new HttpClientHandler();
             HttpClient httpClient = new HttpClient(handler);
             httpClient.Timeout = TimeSpan.FromSeconds(100);
@@ -83,22 +104,23 @@ namespace LastFM_Now_Playing
 
             XmlDocument xmlDoc = new XmlDocument();
             xmlDoc.LoadXml(getResponsestring);
-            XmlNode root = xmlDoc.DocumentElement;     
+            XmlNode root = xmlDoc.DocumentElement;
             string attr = root.SelectSingleNode("/lfm/@status").Value;
 
             if (attr == "ok")
             {
                 startParse.Enabled = true;
-                label1.ForeColor = System.Drawing.Color.Green;
-                label1.Text = "Valid";
+                validity.ForeColor = System.Drawing.Color.Green;
+                validity.Text = "Valid";
             }
 
             if (attr == "failed")
             {
                 startParse.Enabled = false;
-                label1.ForeColor = System.Drawing.Color.DarkRed;
-                label1.Text = "Invalid";
-            }   
+                validity.ForeColor = System.Drawing.Color.DarkRed;
+                validity.Text = "Invalid";
+            }
+
         }
 
         //Getting path to save Now Playing file
@@ -119,8 +141,9 @@ namespace LastFM_Now_Playing
                 check = true;
                 parseStatus.ForeColor = System.Drawing.Color.Green;
                 userName = lfmUsername.Text;
+                validity.Visible = false;
                 parseStatus.Text = "Parsing";
-                startParse.Text = "Stop";
+                startParse.Text = "Stop";         
                 folderPath.Enabled = false;
                 lfmUsername.Enabled = false;
             }
@@ -129,6 +152,7 @@ namespace LastFM_Now_Playing
             {
                 parseStatus.ForeColor = System.Drawing.Color.DarkRed;
                 parseStatus.Text = "Not parsing";
+                validity.Visible = true;
                 startParse.Text = "Start";
                 check = false;
                 folderPath.Enabled = true;
@@ -168,9 +192,9 @@ namespace LastFM_Now_Playing
         //Saving variables
         private void Form1_FormClosed(object sender, FormClosedEventArgs e)
         {
-            Settings.Default.path = folderPath.Text;
-            Settings.Default.username = lfmUsername.Text.Trim();
-            Settings.Default.Save();
+            Properties.Settings.Default.path = folderPath.Text;
+            Properties.Settings.Default.username = lfmUsername.Text.Trim();
+            Properties.Settings.Default.Save();
         }
 
         //Open Settings widnow
